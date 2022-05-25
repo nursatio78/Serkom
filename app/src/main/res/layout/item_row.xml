@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:elevation="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_account_circle_24" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="ID"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:id="@+id/tvID"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="Nama"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:id="@+id/tvNamaProfileShow"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="Jenis Kelamin"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:id="@+id/tvJenisKelamin"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="Nomor"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:id="@+id/tvNomorProfile"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="Lokasi Pendaftaran"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:id="@+id/tvLokasiPendaftaran"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="10dp"
+                android:text="Alamat"
+                android:layout_marginTop="10dp"
+                android:gravity="center|start"
+                android:id="@+id/tvAlamatProfile"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
