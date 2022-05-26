@@ -18,7 +18,7 @@
             android:text="Form Pendaftaran"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="24sp"
+            android:textSize="22sp"
             />
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,12 +30,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama : "
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textColor="@color/black"/>
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
+                android:textSize="16sp"
                 android:hint="Nama Anda"
                 android:id="@+id/et_nama_daftar"/>
         </LinearLayout>
@@ -49,12 +50,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Alamat : "
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textColor="@color/black"/>
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
+                android:textSize="16sp"
                 android:hint="Alamat Anda"
                 android:inputType="textMultiLine"
                 android:id="@+id/et_alamat_daftar"/>
@@ -69,13 +71,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="No Hp : "
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textColor="@color/black"/>
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:hint="Nomor Handphone"
+                android:textSize="16sp"
                 android:inputType="number"
                 android:id="@+id/et_nomor_daftar"/>
         </LinearLayout>
@@ -89,40 +92,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Jenis Kelamin : "
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:layout_gravity="center"
                 android:textColor="@color/black"/>
-            <RadioButton
-                android:id="@+id/rb_laki_daftar"
-                android:layout_width="32dp"
-                android:layout_height="wrap_content" />
-                <TextView
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:orientation="horizontal"
+                android:id="@+id/rg_jenis_kelamin_daftar">
+                <RadioButton
+                    android:id="@+id/rb_laki_daftar"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="Pria"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"/>
-            <RadioButton
-                android:id="@+id/rb_perempuan_daftar"
-                android:layout_width="32dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wanita"
-                android:textColor="@color/black"
-                android:textSize="16sp"/>
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    />
+                <RadioButton
+                    android:id="@+id/rb_perempuan_daftar"
+                    android:layout_width="wrap_content"
+                    android:text="Wanita"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:checked="false"
+                    />
+            </RadioGroup>
         </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textColor="@color/black"
             android:text="Lokasi Pendaftaran :"
             android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -130,11 +137,22 @@
             android:textAllCaps="false"
             android:layout_marginStart="16sp"/>
         <TextView
+            android:id="@+id/tv_lokasi_daftar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:hint="Lokasi Anda"
+            />
+        </LinearLayout>
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload Foto : pilih file.."
             android:layout_margin="16dp"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textColor="@color/black"/>
         <ImageView
             android:layout_width="150dp"
@@ -162,6 +180,23 @@
             android:layout_marginEnd="16dp"
             android:layout_gravity="center"
             android:id="@+id/btn_hasil"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Cek Sensor Pada Smartphone"
+            android:textColor="#ff0000"
+            android:layout_marginTop="10dp"
+            android:textSize="12sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="?actionBarSize"
+            android:text="Cek Jaringan"
+            android:textColor="#ff0000"
+            android:layout_marginTop="10dp"
+            android:textSize="12sp"/>
     </LinearLayout>
     </ScrollView>
 </layout>

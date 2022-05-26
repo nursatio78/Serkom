@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "964923468509",
+    "project_id": "serkom-d58e9",
+    "storage_bucket": "serkom-d58e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964923468509:android:9d1f4f81d25d2df8e08934",
+        "android_client_info": {
+          "package_name": "com.example.serkom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "964923468509-e7kk7t5v9t3b186kdfj439uho7sa93ov.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBncwp223xHAc02inEVVEiZYiKlLN6Po2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "964923468509-e7kk7t5v9t3b186kdfj439uho7sa93ov.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
