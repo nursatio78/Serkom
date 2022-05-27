@@ -3,11 +3,19 @@ package com.example.serkom.database;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import com.example.serkom.callback.ActionListener;
+import com.example.serkom.model.ModelClass;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyDatabaseHelper extends android.database.sqlite.SQLiteOpenHelper {
     private final Context context;
@@ -23,6 +31,8 @@ public class MyDatabaseHelper extends android.database.sqlite.SQLiteOpenHelper {
     private static final String COLUMN_GENDER = "gender";
     private static final String COLUMN_LOKASI = "lokasi_terkini";
     private static final String COLUMN_PHOTO = "url_photo";
+
+    private ByteArrayOutputStream objectByteArrayOutputStream;
 
     public MyDatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,16 +77,31 @@ public class MyDatabaseHelper extends android.database.sqlite.SQLiteOpenHelper {
         return result != -1;
     }
 
-    Cursor readAllData() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME;
+    public List<ModelClass> readAllData() {
+        try {
+            SQLiteDatabase db = this.getReadableDatabase();
+            List<ModelClass> modelClassList = new ArrayList<>();
+            Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+            if (cursor.getCount()!=0){
+                while (cursor.moveToNext()) {
+                    String nama = cursor.getString(1);
+                    String alamat = cursor.getString(5);
+                    String nomor = cursor.getString(4);
+                    String gender = cursor.getString(2);
+                    String lokasi_terkini = cursor.getString(3);
+                    byte[] url_photo = cursor.getBlob(6);
 
-        Cursor cursor = null;
-        if (db != null) {
-            cursor = db.rawQuery(query, null);
-            cursor.moveToFirst();
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(url_photo, 0, url_photo.length);
+                    modelClassList.add(new ModelClass(nama, alamat, gender, lokasi_terkini, nomor,bitmap));
+                }
+                return modelClassList;
+            } else {
+                Toast.makeText(context, "No Values exists in Database", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return cursor;
+        return null;
     }
 }
 
