@@ -12,63 +12,133 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/imageProfile"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_baseline_account_circle_24" />
-
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:text="ID"
-                android:layout_marginTop="10dp"
-                android:gravity="center|start"
-                android:id="@+id/tvID"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:text="Nama :"
+                    android:layout_marginTop="10dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16sp"
+                    android:hint="Nama"
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/tvNama"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:text="Nama"
-                android:layout_marginTop="10dp"
-                android:gravity="center|start"
-                android:id="@+id/tvNamaProfileShow"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:text="Jenis Kelamin :"
+                    android:layout_marginTop="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Jenis Kelamin"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="16dp"
+                    android:id="@+id/tvGender"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:text="Jenis Kelamin"
-                android:layout_marginTop="10dp"
-                android:gravity="center|start"
-                android:id="@+id/tvJenisKelamin"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:text="Nomor :"
+                    android:layout_marginTop="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nomor"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="16dp"
+                    android:id="@+id/tvNomorProfile"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:text="Nomor"
-                android:layout_marginTop="10dp"
-                android:gravity="center|start"
-                android:id="@+id/tvNomorProfile"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lokasi Pendaftaran :"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Lokasi Pendaftaran"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="16dp"
+                    android:id="@+id/tvLokasiPendaftaran"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:text="Lokasi Pendaftaran"
-                android:layout_marginTop="10dp"
-                android:gravity="center|start"
-                android:id="@+id/tvLokasiPendaftaran"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:text="Alamat :"
+                    android:layout_marginTop="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Alamat"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="16dp"
+                    android:id="@+id/tvAlamatProfile"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawablePadding="10dp"
-                android:text="Alamat"
-                android:layout_marginTop="10dp"
-                android:gravity="center|start"
-                android:id="@+id/tvAlamatProfile"/>
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="update"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:id="@+id/btUpdate"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="hapus"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:id="@+id/btHapus"/>
+
+            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

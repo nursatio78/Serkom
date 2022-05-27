@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private FusedLocationProviderClient fusedLocationClient;
 
     final int PERMISSION_LOCATION_REQUEST_CODE = 1;
+    final int PERMISSION_STORAGE_REQUEST_CODE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         myDB = new MyDatabaseHelper(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
 
-//        member = new Member(binding.etNamaDaftar.getText().toString(), binding.etAlamatDaftar.getText().toString(), binding.etNomorDaftar.getText().toString(), );
         binding.btnDaftar.setOnClickListener(this::onViewClicked);
         binding.ivBarang.setOnClickListener(this::onViewClicked);
         binding.btnHasil.setOnClickListener(this::onViewClicked);
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 Manifest.permission.ACCESS_FINE_LOCATION);
         return true;
     }
+
     private void requestLocationPermission() {
         EasyPermissions.requestPermissions(MainActivity.this, "Izin Lokasi",
                 PERMISSION_LOCATION_REQUEST_CODE,
@@ -84,9 +85,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @SuppressLint("MissingPermission")
     private void onViewClicked(View view) {
-        String m1 = binding.rbLakiDaftar.getText().toString();
-        String m2 = binding.rbPerempuanDaftar.getText().toString();
-
         switch (view.getId()){
             case R.id.btn_daftar:
                 if (validasidata()){
@@ -97,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }
                 break;
             case R.id.ivBarang:
-                pilihPhoto();
+                    pilihPhoto();
                 break;
 
             case R.id.btn_hasil:
@@ -164,10 +162,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void pilihPhoto() {
-        pickFromGallery();
-    }
-
-    private void pickFromGallery() {
         Intent i = new Intent();
         i.setType("image/*");
         i.setAction(Intent.ACTION_GET_CONTENT);
@@ -208,11 +202,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        Snackbar.make(binding.getRoot(), "Izin Lokasi diterima", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
+        Snackbar.make(binding.getRoot(), "Izin diterima", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        Snackbar.make(binding.getRoot(), "Izin Lokasi ditolak", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
+        Snackbar.make(binding.getRoot(), "Izin ditolak", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
     }
 }
