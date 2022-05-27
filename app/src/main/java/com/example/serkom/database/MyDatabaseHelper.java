@@ -48,7 +48,7 @@ public class MyDatabaseHelper extends android.database.sqlite.SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addPendaftaran(String nama, String alamat, String nomor, String gender, byte[] img) {
+    public boolean addPendaftaran(String nama, String alamat, String nomor, String lokasi_terkini, String gender, byte[] img) {
         android.database.sqlite.SQLiteDatabase db = this.getWritableDatabase();
         android.content.ContentValues cv = new android.content.ContentValues();
 
@@ -56,7 +56,7 @@ public class MyDatabaseHelper extends android.database.sqlite.SQLiteOpenHelper {
         cv.put(COLUMN_ALAMAT, alamat);
         cv.put(COLUMN_NOMOR, nomor);
         cv.put(COLUMN_GENDER, gender);
-//        cv.put(COLUMN_LOKASI, lokasi_terkini);
+        cv.put(COLUMN_LOKASI, lokasi_terkini);
         cv.put(COLUMN_PHOTO, img);
         long result = db.insert(TABLE_NAME, null, cv);
         if (result == -1) {

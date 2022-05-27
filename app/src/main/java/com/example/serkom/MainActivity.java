@@ -2,46 +2,47 @@ package com.example.serkom;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
-import android.content.ContentValues;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.Toast;
 
 import com.example.serkom.callback.ActionListener;
 import com.example.serkom.database.MyDatabaseHelper;
 import com.example.serkom.databinding.ActivityMainBinding;
-import com.example.serkom.model.Member;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import pub.devrel.easypermissions.EasyPermissions;
+
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
     private ActivityMainBinding binding;
-    private SQLiteDatabase db;
     private MyDatabaseHelper myDB;
     private MainViewModel viewModel;
     public Uri imageUri;
+    private FusedLocationProviderClient fusedLocationClient;
 
+    final int PERMISSION_LOCATION_REQUEST_CODE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,26 +50,31 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this, new ProfileVMFactory(actionListener)).get(MainViewModel.class);
 
         myDB = new MyDatabaseHelper(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
 
 //        member = new Member(binding.etNamaDaftar.getText().toString(), binding.etAlamatDaftar.getText().toString(), binding.etNomorDaftar.getText().toString(), );
         binding.btnDaftar.setOnClickListener(this::onViewClicked);
         binding.ivBarang.setOnClickListener(this::onViewClicked);
         binding.btnHasil.setOnClickListener(this::onViewClicked);
+        binding.btLocation.setOnClickListener(this::onViewClicked);
     }
 
-//    public void pushData() {
-//        String gender = "";
-//        if (binding.rbLakiDaftar.isChecked()) {
-//            gender = "Pria";
-//        } else {
-//            gender = "Wanita";
-//        }
-//        viewModel.pushData("" + binding.etNamaDaftar.getText().toString(),
-//                "" + binding.etAlamatDaftar.getText().toString(),
-//                "" + binding.etNomorDaftar.getText().toString(),
-//                "" + gender,
-//                imageUri);
-//    }
+    private boolean hasLocationPermission() {
+        EasyPermissions.hasPermissions(MainActivity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        return true;
+    }
+    private void requestLocationPermission() {
+        EasyPermissions.requestPermissions(MainActivity.this, "Izin Lokasi",
+                PERMISSION_LOCATION_REQUEST_CODE,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
 
     public boolean validasidata() {
         return !TextUtils.isEmpty(binding.etNamaDaftar.getText().toString()) &&
@@ -76,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 !TextUtils.isEmpty(binding.etNomorDaftar.getText().toString());
     }
 
+    @SuppressLint("MissingPermission")
     private void onViewClicked(View view) {
         String m1 = binding.rbLakiDaftar.getText().toString();
         String m2 = binding.rbPerempuanDaftar.getText().toString();
@@ -84,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_daftar:
                 if (validasidata()){
                     insertData();
+                    pushData();
                 } else {
                     Snackbar.make(binding.getRoot(), "Isian harus diisi!", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(R.id.btn_daftar).show();
                 }
@@ -95,7 +103,41 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_hasil:
                 startActivity(new Intent(MainActivity.this, HasilPendaftaranActivity.class));
                 break;
+
+            case R.id.btLocation:
+                if (hasLocationPermission()) {
+                    requestLocationPermission();
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(this, location -> {
+                                Geocoder geoCoder = new Geocoder(this);
+                                try {
+                                    List<Address> currentLocation = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                    binding.tvLocation.setText(currentLocation.get(0).getAddressLine(0));
+                                    Log.d("Location", currentLocation.get(0).getAddressLine(0));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                } else {
+                    Snackbar.make(binding.getRoot(), "Izin Lokasi tidak diperbolehkan!", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(R.id.btLocation).show();
+                }
+                break;
         }
+    }
+
+    private void pushData() {
+        String gender = "";
+        if (binding.rbLakiDaftar.isChecked()) {
+            gender = "Pria";
+        } else {
+            gender = "Wanita";
+        }
+        viewModel.pushData(binding.etNamaDaftar.getText().toString(),
+                binding.etAlamatDaftar.getText().toString(),
+                binding.etNomorDaftar.getText().toString(),
+                binding.tvLocation.getText().toString(),
+                gender,
+                imageUri);
     }
 
     private void insertData() {
@@ -108,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         myDB.addPendaftaran(binding.etNamaDaftar.getText().toString(),
                 binding.etAlamatDaftar.getText().toString(),
                 binding.etNomorDaftar.getText().toString(),
+                binding.tvLocation.getText().toString(),
                 gender,
                 ImageViewToByte(binding.ivBarang));
     }
@@ -162,4 +205,14 @@ public class MainActivity extends AppCompatActivity {
             binding.btnDaftar.setEnabled(true);
         }
     };
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+        Snackbar.make(binding.getRoot(), "Izin Lokasi diterima", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        Snackbar.make(binding.getRoot(), "Izin Lokasi ditolak", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
+    }
 }

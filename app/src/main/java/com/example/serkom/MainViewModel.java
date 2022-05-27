@@ -29,7 +29,7 @@ public class MainViewModel extends ViewModel {
         this.actionListener = actionListener;
     }
 
-    public void pushData(String nama, String alamat, String nomor, String gender, Uri imageUri){
+    public void pushData(String nama, String alamat, String nomor, String lokasi_terkini, String gender, Uri imageUri){
         myRef = FirebaseDatabase.getInstance().getReference().child("Users").child(nama);
         storageReference = FirebaseStorage.getInstance().getReference().child("imagePost").child(imageUri.getLastPathSegment());
         storageReference.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -44,7 +44,7 @@ public class MainViewModel extends ViewModel {
                         profileHashMap.put("nama", nama);
                         profileHashMap.put("alamat", alamat);
                         profileHashMap.put("nomor", nomor);
-//                        profileHashMap.put("lokasi_terkini", lokasi_terkini);
+                        profileHashMap.put("lokasi_terkini", lokasi_terkini);
                         profileHashMap.put("gender", gender);
                         profileHashMap.put("image", t);
 
