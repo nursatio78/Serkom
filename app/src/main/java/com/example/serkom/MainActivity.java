@@ -2,20 +2,27 @@ package com.example.serkom;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +33,8 @@ import com.example.serkom.database.MyDatabaseHelper;
 import com.example.serkom.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -85,9 +94,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @SuppressLint("MissingPermission")
     private void onViewClicked(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_daftar:
-                if (validasidata()){
+                if (validasidata()) {
                     insertData();
                     pushData();
                 } else {
@@ -95,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 }
                 break;
             case R.id.ivBarang:
-                    pilihPhoto();
+                pilihPhoto();
                 break;
 
             case R.id.btn_hasil:
@@ -103,23 +112,35 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 break;
 
             case R.id.btLocation:
-                if (hasLocationPermission()) {
-                    requestLocationPermission();
-                    fusedLocationClient.getLastLocation()
-                            .addOnSuccessListener(this, location -> {
-                                Geocoder geoCoder = new Geocoder(this);
-                                try {
-                                    List<Address> currentLocation = geoCoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                                    binding.tvLocation.setText(currentLocation.get(0).getAddressLine(0));
-                                    Log.d("Location", currentLocation.get(0).getAddressLine(0));
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                try {
+                    if (hasLocationPermission()) {
+                        requestLocationPermission();
+                        Task<Location> locationResult = fusedLocationClient.getLastLocation();
+                        locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Location> task) {
+                                if (task.isSuccessful() && task.getResult() != null) {
+                                    Location location = task.getResult();
+                                    Geocoder geocoder = new Geocoder(MainActivity.this);
+                                    List<Address> addresses = null;
+                                    try {
+                                        addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    assert addresses != null;
+                                    String address = addresses.get(0).getAddressLine(0);
+                                    binding.tvLocation.setText(address);
+                                } else {
+                                    Snackbar.make(binding.getRoot(), "Izin Lokasi tidak diperbolehkan!", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(R.id.btLocation).show();
                                 }
-                            });
-                } else {
-                    Snackbar.make(binding.getRoot(), "Izin Lokasi tidak diperbolehkan!", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(R.id.btLocation).show();
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                break;
+                    break;
         }
     }
 

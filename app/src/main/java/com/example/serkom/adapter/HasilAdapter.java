@@ -40,7 +40,7 @@ public class HasilAdapter extends RecyclerView.Adapter<HasilAdapter.Viewholder> 
     @Override
     public HasilAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row, parent, false);
+        View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row_f, parent, false);
         return new Viewholder(v);
     }
 
@@ -111,7 +111,7 @@ public class HasilAdapter extends RecyclerView.Adapter<HasilAdapter.Viewholder> 
             tvLokasi= itemView.findViewById(R.id.tvLokasiPendaftaran);
             tvNomor= itemView.findViewById(R.id.tvNomorProfile);
 
-            btHapus= itemView.findViewById(R.id.btHapus);
+            btHapus= itemView.findViewById(R.id.btDelete);
             btUpdate= itemView.findViewById(R.id.btUpdate);
         }
     }

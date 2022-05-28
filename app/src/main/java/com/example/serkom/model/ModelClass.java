@@ -3,7 +3,7 @@ package com.example.serkom.model;
 import android.graphics.Bitmap;
 
 public class ModelClass {
-    private String nama, lokasi_terkini, alamat, nomor, gender;
+    private String _id, nama, lokasi_terkini, alamat, nomor, gender;
     private Bitmap image;
 
     public ModelClass(String nama, String lokasi_terkini, String alamat, String nomor, String gender, Bitmap image) {
@@ -13,6 +13,14 @@ public class ModelClass {
         this.nomor = nomor;
         this.gender = gender;
         this.image = image;
+    }
+
+    public String get_id() {
+        return _id;
+    }
+
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
     public String getNama() {
