@@ -43,7 +43,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     Activity activity;
     List<ModelClass> objectModelClass;
 
-    public CustomAdapter(Context context, List<ModelClass> objectModelClass) {
+    public CustomAdapter(Activity activity, Context context, List<ModelClass> objectModelClass) {
+        this.activity = activity;
         this.context = context;
         this.objectModelClass = objectModelClass;
     }
@@ -51,7 +52,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     @NonNull
     @Override
     public CustomAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row_f, parent, false);
+        View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row, parent, false);
         return new CustomAdapter.ViewHolder(v);
     }
 
@@ -66,15 +67,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         holder.tvNomor.setText(modelClass.getNomor());
 
         holder.imageView.setImageBitmap(modelClass.getImage());
-        holder.btHapus.setOnClickListener(new View.OnClickListener() {
+
+        holder.mainLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int position = holder.getAdapterPosition();
-                String sID = modelClass.get_id();
-                MyDatabaseHelper myDatabaseHelper = new MyDatabaseHelper(context);
-                myDatabaseHelper.deleteData(sID);
-                Toast.makeText(context, "Data Deleted", Toast.LENGTH_SHORT).show();
-                notifyItemRemoved(position);
+                Intent intent = new Intent(context, UpdateActivity.class);
+                intent.putExtra("nama", modelClass.getNama());
+                intent.putExtra("alamat", modelClass.getAlamat());
+                intent.putExtra("nomor", modelClass.getNomor());
+                activity.startActivityForResult(intent, 1);
             }
         });
     }
@@ -86,7 +87,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView tvNama, tvAlamat, tvGender, tvLokasi, tvNomor;
-        Button btHapus, btUpdate;
         LinearLayout mainLayout;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,9 +98,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             tvGender= itemView.findViewById(R.id.tvGender);
             tvLokasi= itemView.findViewById(R.id.tvLokasiPendaftaran);
             tvNomor= itemView.findViewById(R.id.tvNomorProfile);
-
-            btHapus= itemView.findViewById(R.id.btHapus);
-            btUpdate= itemView.findViewById(R.id.btUpdate);
         }
     }
 }

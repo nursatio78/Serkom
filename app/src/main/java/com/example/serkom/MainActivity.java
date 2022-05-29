@@ -27,6 +27,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.serkom.callback.ActionListener;
 import com.example.serkom.database.MyDatabaseHelper;
@@ -195,6 +196,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         if (requestCode == 1 && resultCode == RESULT_OK && data!=null && data.getData()!=null) {
             imageUri = data.getData();
             binding.ivBarang.setImageURI(imageUri);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        if (activeNetwork == null || !activeNetwork.isConnectedOrConnecting()) {
+            Toast.makeText(this, "Tidak ada koneksi internet!", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Ada koneksi internet!", Toast.LENGTH_LONG).show();
         }
     }
 

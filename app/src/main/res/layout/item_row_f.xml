@@ -128,14 +128,14 @@
                     android:text="Delete"
                     android:textAllCaps="false"
                     android:backgroundTint="#ff0000"
-                    android:id="@+id/btHapus"
+                    android:id="@+id/btHapusF"
                     android:layout_margin="10dp"/>
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Update"
                     android:textAllCaps="false"
-                    android:id="@+id/btUpdate"
+                    android:id="@+id/btUpdateF"
                     android:layout_margin="10dp"/>
 
             </LinearLayout>

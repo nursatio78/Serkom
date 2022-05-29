@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -50,13 +51,19 @@ public class HasilPendaftaranActivity extends AppCompatActivity {
         recyclerView = binding.recyclerView;
 
         hasilPendaftaranList = new ArrayList<Member>();
-        hasilAdapter=new HasilAdapter(HasilPendaftaranActivity.this, hasilPendaftaranList);
+        hasilAdapter = new HasilAdapter(HasilPendaftaranActivity.this, hasilPendaftaranList);
 
-        customAdapter = new CustomAdapter( this, myDB.readAllData());
+        customAdapter = new CustomAdapter(HasilPendaftaranActivity.this,this, myDB.readAllData());
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         getAllData();
         modelClassList = new ArrayList<ModelClass>();
+
+        binding.btHapusSemua.setOnClickListener(v -> {
+            myDB.truncateData();
+            customAdapter.notifyDataSetChanged();
+            recyclerView.setAdapter(customAdapter);
+        });
     }
 
     @Override
@@ -68,37 +75,41 @@ public class HasilPendaftaranActivity extends AppCompatActivity {
     }
 
     private void getAllData() {
-        if (myDB.readAllData() == null) {myRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Member member = snapshot.getValue(Member.class);
-                hasilPendaftaranList.add(member);
-                hasilAdapter.notifyDataSetChanged();
-                recyclerView.setAdapter(hasilAdapter);
-            }
+        if (myDB.readAllData() != null) {
+            recyclerView.setAdapter(customAdapter);
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+        } else {
+            myRef.addChildEventListener(new ChildEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    Member member = snapshot.getValue(Member.class);
+                    hasilPendaftaranList.add(member);
+                    hasilAdapter.notifyDataSetChanged();
+                    recyclerView.setAdapter(hasilAdapter);
+                }
 
-            }
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                }
 
-            }
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                }
 
-            }
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                }
 
-            }
-        });
-            } else {
-                recyclerView.setAdapter(customAdapter);
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+
+            });
         }
     }
 }

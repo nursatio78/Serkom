@@ -111,8 +111,8 @@ public class HasilAdapter extends RecyclerView.Adapter<HasilAdapter.Viewholder> 
             tvLokasi= itemView.findViewById(R.id.tvLokasiPendaftaran);
             tvNomor= itemView.findViewById(R.id.tvNomorProfile);
 
-            btHapus= itemView.findViewById(R.id.btDelete);
-            btUpdate= itemView.findViewById(R.id.btUpdate);
+            btHapus= itemView.findViewById(R.id.btHapusF);
+            btUpdate= itemView.findViewById(R.id.btUpdateF);
         }
     }
 }
