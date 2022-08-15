@@ -1,5 +1,7 @@
 package com.example.serkom;
 
+import static androidx.constraintlayout.motion.widget.Debug.getLocation;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -38,13 +40,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
+import com.vmadalin.easypermissions.EasyPermissions;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import pub.devrel.easypermissions.EasyPermissions;
-
+@SuppressLint("MissingPermission")
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
     private ActivityMainBinding binding;
     private MyDatabaseHelper myDB;
@@ -61,12 +63,50 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         viewModel = new ViewModelProvider(this, new ProfileVMFactory(actionListener)).get(MainViewModel.class);
 
         myDB = new MyDatabaseHelper(this);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         binding.btnDaftar.setOnClickListener(this::onViewClicked);
         binding.ivBarang.setOnClickListener(this::onViewClicked);
         binding.btnHasil.setOnClickListener(this::onViewClicked);
         binding.btLocation.setOnClickListener(this::onViewClicked);
+
+        onPermissionGranted();
+        onPermissionDenied();
+    }
+
+    private void onPermissionDenied() {
+        if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            EasyPermissions.requestPermissions(this, "Izin untuk mengakses lokasi anda", PERMISSION_LOCATION_REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    private void onPermissionGranted() {
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            fusedLocationClient.getLastLocation()
+                    .addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                Location currentLocation = task.getResult();
+                                Geocoder geocoder = new Geocoder(MainActivity.this);
+                                List<Address> addresses = null;
+                                try {
+                                    addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                String address = addresses.get(0).getAddressLine(0);
+                                String city = addresses.get(0).getLocality();
+                                String state = addresses.get(0).getAdminArea();
+                                String country = addresses.get(0).getCountryName();
+                                String postalCode = addresses.get(0).getPostalCode();
+                                String knownName = addresses.get(0).getFeatureName();
+                                binding.etAlamatDaftar.setText(address + ", " + city + ", " + state + ", " + country + ", " + postalCode + ", " + knownName);
+                                binding.tvLocation.setText(address + ", " + city + ", " + state + ", " + country + ", " + postalCode + ", " + knownName);
+                            }
+                        }
+                    });
+        }
     }
 
     private boolean hasLocationPermission() {
@@ -76,7 +116,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void requestLocationPermission() {
-        EasyPermissions.requestPermissions(MainActivity.this, "Izin Lokasi",
+        EasyPermissions.requestPermissions(
+                MainActivity.this,
+                "Aplikasi ini tidak bisa berjalan tanpa izin lokasi",
                 PERMISSION_LOCATION_REQUEST_CODE,
                 Manifest.permission.ACCESS_FINE_LOCATION);
     }
@@ -93,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 !TextUtils.isEmpty(binding.etNomorDaftar.getText().toString());
     }
 
-    @SuppressLint("MissingPermission")
     private void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_daftar:
@@ -113,35 +154,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 break;
 
             case R.id.btLocation:
-                try {
-                    if (hasLocationPermission()) {
-                        requestLocationPermission();
-                        Task<Location> locationResult = fusedLocationClient.getLastLocation();
-                        locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                if (task.isSuccessful() && task.getResult() != null) {
-                                    Location location = task.getResult();
-                                    Geocoder geocoder = new Geocoder(MainActivity.this);
-                                    List<Address> addresses = null;
-                                    try {
-                                        addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                    assert addresses != null;
-                                    String address = addresses.get(0).getAddressLine(0);
-                                    binding.tvLocation.setText(address);
-                                } else {
-                                    Snackbar.make(binding.getRoot(), "Izin Lokasi tidak diperbolehkan!", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(R.id.btLocation).show();
-                                }
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                    break;
+                onPermissionGranted();
+                break;
         }
     }
 
@@ -236,12 +250,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     };
 
     @Override
-    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        Snackbar.make(binding.getRoot(), "Izin diterima", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        Snackbar.make(binding.getRoot(), "Izin ditolak", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
     }
 
     @Override
-    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        Snackbar.make(binding.getRoot(), "Izin ditolak", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
+    public void onPermissionsGranted(int i, @NonNull List<String> list) {
+        Snackbar.make(binding.getRoot(), "Izin diterima", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
     }
 }
