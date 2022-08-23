@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -14,6 +15,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
@@ -34,20 +37,28 @@ import android.widget.Toast;
 import com.example.serkom.callback.ActionListener;
 import com.example.serkom.database.MyDatabaseHelper;
 import com.example.serkom.databinding.ActivityMainBinding;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
-import com.vmadalin.easypermissions.EasyPermissions;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.normal.TedPermission;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 @SuppressLint("MissingPermission")
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private MyDatabaseHelper myDB;
     private MainViewModel viewModel;
@@ -56,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     final int PERMISSION_LOCATION_REQUEST_CODE = 1;
     final int PERMISSION_STORAGE_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,63 +82,26 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         binding.btnHasil.setOnClickListener(this::onViewClicked);
         binding.btLocation.setOnClickListener(this::onViewClicked);
 
-        onPermissionGranted();
-        onPermissionDenied();
+        getLocations();
     }
 
-    private void onPermissionDenied() {
-        if (!EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            EasyPermissions.requestPermissions(this, "Izin untuk mengakses lokasi anda", PERMISSION_LOCATION_REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-    }
+    private void getLocations() {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            }
 
-    private void onPermissionGranted() {
-        if (EasyPermissions.hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            fusedLocationClient.getLastLocation()
-                    .addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                Location currentLocation = task.getResult();
-                                Geocoder geocoder = new Geocoder(MainActivity.this);
-                                List<Address> addresses = null;
-                                try {
-                                    addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                String address = addresses.get(0).getAddressLine(0);
-                                String city = addresses.get(0).getLocality();
-                                String state = addresses.get(0).getAdminArea();
-                                String country = addresses.get(0).getCountryName();
-                                String postalCode = addresses.get(0).getPostalCode();
-                                String knownName = addresses.get(0).getFeatureName();
-                                binding.etAlamatDaftar.setText(address + ", " + city + ", " + state + ", " + country + ", " + postalCode + ", " + knownName);
-                                binding.tvLocation.setText(address + ", " + city + ", " + state + ", " + country + ", " + postalCode + ", " + knownName);
-                            }
-                        }
-                    });
-        }
-    }
-
-    private boolean hasLocationPermission() {
-        EasyPermissions.hasPermissions(MainActivity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-        return true;
-    }
-
-    private void requestLocationPermission() {
-        EasyPermissions.requestPermissions(
-                MainActivity.this,
-                "Aplikasi ini tidak bisa berjalan tanpa izin lokasi",
-                PERMISSION_LOCATION_REQUEST_CODE,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(MainActivity.this, "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+                .check();
     }
 
     public boolean validasidata() {
@@ -154,9 +129,84 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 break;
 
             case R.id.btLocation:
-                onPermissionGranted();
+                if (ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+                    Location();
+                } else {
+                    ActivityCompat.requestPermissions(this, 
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 
+                            PERMISSION_LOCATION_REQUEST_CODE);
+                }
                 break;
         }
+    }
+
+    private void Location() {
+
+        LocationRequest request = com.google.android.gms.location.LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setInterval(5000);
+        request.setFastestInterval(2000);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(request);
+        builder.setAlwaysShow(true);
+
+        Task<LocationSettingsResponse> result = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build());
+        result.addOnCompleteListener(this, new OnCompleteListener<LocationSettingsResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
+                try {
+                    LocationSettingsResponse response = task.getResult(ApiException.class);
+                    // All location settings are satisfied. The client can initialize location requests here.
+                    getLocations();
+                    ambilLokasi();
+                } catch (ApiException exception) {
+                    switch (exception.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // Location settings are not satisfied. But could be fixed by showing the user a dialog.
+                            try {
+                                // Cast to a resolvable exception.
+                                ResolvableApiException resolvable = (ResolvableApiException) exception;
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                resolvable.startResolutionForResult(MainActivity.this,
+                                        PERMISSION_LOCATION_REQUEST_CODE);
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            } catch (ClassCastException e) {
+                                // Ignore, should be an impossible error.
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            // Location settings are not satisfied. However, we have no way to fix the settings so we won't show the dialog.
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void ambilLokasi() {
+        fusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+            @Override
+            public void onComplete(@NonNull Task<Location> task) {
+                Location location = task.getResult();
+                Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+                List<Address> addresses = null;
+                if (location != null){
+                    try {
+                        addresses  = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    String address = addresses.get(0).getAddressLine(0);
+                    String postalCode = addresses.get(0).getPostalCode();
+                    binding.etAlamatDaftar.setText(address + ", " + postalCode);
+                    binding.tvLocation.setText(address + ", " + postalCode);
+                }
+            }
+        });
     }
 
     private void pushData() {
@@ -198,10 +248,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
     private void pilihPhoto() {
-        Intent i = new Intent();
-        i.setType("image/*");
-        i.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(i, 1);
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_STORAGE_REQUEST_CODE);
+        }
+//        Intent i = new Intent();
+//        i.setType("image/*");
+//        i.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(i, 1);
     }
 
     @Override
@@ -248,14 +309,4 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             binding.btnDaftar.setEnabled(true);
         }
     };
-
-    @Override
-    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        Snackbar.make(binding.getRoot(), "Izin ditolak", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
-    }
-
-    @Override
-    public void onPermissionsGranted(int i, @NonNull List<String> list) {
-        Snackbar.make(binding.getRoot(), "Izin diterima", BaseTransientBottomBar.LENGTH_LONG).setAnchorView(binding.etNamaDaftar).show();
-    }
 }
